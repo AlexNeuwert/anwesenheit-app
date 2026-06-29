@@ -1,0 +1,17 @@
+<h2>Monatsübersicht</h2>
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Klasse</th>
+        <th>Kosten (€)</th>
+    </tr>
+
+    {% for student in results %}
+    <tr>
+        <td>{{ student.name }}</td>
+        <td>{{ student.class }}</td>
+        <td>{{ student.cost }}</td>
+    </tr>
+    {% endfor %}
+</table>

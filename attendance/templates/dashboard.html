@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anwesenheit</title>
+
+    <style>
+        .student-btn {
+            margin: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Anwesenheit</h1>
+
+<!-- 🔹 Buttons oben -->
+<a href="/export_excel/">
+    <button>Export als Excel</button>
+</a>
+
+<a href="/monat/">
+    <button>Monatsabrechnung</button>
+</a>
+
+<hr>
+
+<!-- 🔹 Klassen -->
+<h2>Klassen</h2>
+
+ <!-- Klassen-Button -->
+
+<div id="classButtons">
+
+{% for class_name, class_students in grouped_students.items %}
+    <button onclick="showClass('{{ class_name }}')" style="margin:5px;">
+        {{ class_name }}
+    </button>
+{% endfor %}
+
+</div>
+
+
+    <!-- Schüler -->
+<div id="studentContainer">
+
+{% for class_name, class_students in grouped_students.items %}
+    <div class="class-block" data-class="{{ class_name }}" style="display:none;">
+
+        <h3>Klasse {{ class_name }}</h3>
+
+<form method="get">
+    <label>Datum wählen:</label>
+    <input type="date" name="date" value="{{ request.GET.date }}">
+
+    <button type="submit">Anzeigen</button>
+</form>
+
+        <table border="1" style="margin-top:10px;">
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Kommen</th>
+        <th>Gehen</th>
+    </tr>
+
+    {% for student in class_students %}
+    <tr>
+        <td>{{ student.name }}</td>
+        <td>{{ student.status }}</td>
+        <td>{{ student.check_in }}</td>
+        <td>{{ student.check_out }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+    </div>
+{% endfor %}
+
+</div>
+
+
+  </div>
+
+<hr>
+
+<!-- 🔹 Status -->
+<h2>Status</h2>
+
+<a href="/">
+    <button>Aktualisieren</button>
+</a>
+
+<!-- 🔹 JS -->
+<script>
+    
+function showClass(className) {
+    let blocks = document.querySelectorAll(".class-block");
+
+    blocks.forEach(b => {
+        b.style.display = "none";
+    });
+
+    let selected = document.querySelector('[data-class="' + className + '"]');
+    if (selected) {
+        selected.style.display = "block";
+    }
+}
+
+// 👇 erste Klasse automatisch anzeigen
+window.onload = function() {
+    let first = document.querySelector(".class-block");
+    if (first) {
+        first.style.display = "block";
+    }
+};
+function toggleStudents(className) {
+    const element = document.getElementById("students-" + className);
+
+    if (!element) {
+        console.log("Element nicht gefunden:", className);
+        return;
+    }
+
+    if (element.style.display === "none") {
+        element.style.display = "block";
+    } else {
+        element.style.display = "none";
+    }
+}
+
+</script>
+
+</body>
+</html>
