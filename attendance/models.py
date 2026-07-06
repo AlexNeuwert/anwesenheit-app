@@ -1,9 +1,17 @@
 from django.db import models
 from django.utils.timezone import now
+class SchoolClass(models.Model):
+    grade = models.IntegerField()
+    section = models.CharField(max_length=1)
 
+    def __str__(self):
+        return f"{self.grade}{self.section}"
 class Student(models.Model):
     name = models.CharField(max_length=100)
-    student_class = models.CharField(max_length=10)
+    school_class = models.ForeignKey(
+    SchoolClass,
+    on_delete=models.PROTECT
+    )
 
     def __str__(self):
         return self.name

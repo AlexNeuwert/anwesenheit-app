@@ -276,7 +276,13 @@ def export_excel(request):
     students = Student.objects.all()
 
     for student in students:
-        last_entry = Attendance.objects.filter(student=student).last()
+        from datetime import date
+
+        last_entry = Attendance.objects.filter(
+            student=student,
+            date=date.today()
+        ).last()
+
 
         if last_entry:
             check_in = last_entry.check_in
