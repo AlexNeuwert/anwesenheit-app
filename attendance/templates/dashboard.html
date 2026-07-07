@@ -64,6 +64,7 @@
         <th>Status</th>
         <th>Kommen</th>
         <th>Gehen</th>
+        <th>Hinweis</th>
     </tr>
 
     {% for student in class_students %}
@@ -72,6 +73,7 @@
         <td>{{ student.status }}</td>
         <td>{{ student.check_in }}</td>
         <td>{{ student.check_out }}</td>
+        <td>{{ student.note }}</td>
     </tr>
     {% endfor %}
 

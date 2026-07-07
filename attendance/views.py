@@ -62,7 +62,8 @@ def dashboard(request):
             "class": student.student_class,
             "check_in": check_in.strftime("%H:%M") if check_in else "-",
             "check_out": check_out.strftime("%H:%M") if check_out else "-",
-            "status": status
+            "status": status,
+            "note": student.note
         })
    
     
