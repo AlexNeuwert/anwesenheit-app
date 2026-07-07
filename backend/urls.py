@@ -31,4 +31,5 @@ urlpatterns = [
     path('export_excel/', views.export_excel),
     path('monat/', views.monthly_report),
     path('monat/', views.monthly_overview),
+    path('edit/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
 ]

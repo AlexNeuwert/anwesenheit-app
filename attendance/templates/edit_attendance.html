@@ -1,0 +1,29 @@
+<h2>Zeiten bearbeiten</h2>
+
+<p>{{ attendance.student.name }}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        Kommen:
+        <input
+            type="time"
+            name="check_in"
+            value="{{ attendance.check_in|time:'H:i' }}"
+        >
+    </p>
+
+    <p>
+        Gehen:
+        <input
+            type="time"
+            name="check_out"
+            value="{{ attendance.check_out|time:'H:i' }}"
+        >
+    </p>
+
+    <button type="submit">
+        Speichern
+    </button>
+</form>

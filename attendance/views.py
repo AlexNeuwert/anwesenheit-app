@@ -1,7 +1,7 @@
 import csv
 from urllib import request, response
 
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from .models import Student, Attendance
 from datetime import datetime, time
@@ -36,6 +36,10 @@ def dashboard(request):
                 date=date.today()
         ).last()
 
+            latest_entry = Attendance.objects.filter(
+                student=student
+            ).last()
+
 
         if last_entry and last_entry.check_out is None:
             status = "✅ da"
@@ -57,12 +61,13 @@ def dashboard(request):
             status = "❌"
 
         grouped_students[student.student_class].append({
-             "id": student.id,
-             "name": student.name,
+            "id": student.id,
+            "name": student.name,
             "class": student.student_class,
             "check_in": check_in.strftime("%H:%M") if check_in else "-",
             "check_out": check_out.strftime("%H:%M") if check_out else "-",
             "status": status,
+            "attendance_id": latest_entry.id if latest_entry else None,
             "note": student.note
         })
    
@@ -368,3 +373,23 @@ def monthly_report(request):
         ])
 
     return response
+from django.shortcuts import get_object_or_404
+def edit_attendance(request, attendance_id):
+    attendance = get_object_or_404(
+        Attendance,
+        id=attendance_id
+    )
+
+    if request.method == "POST":
+        attendance.check_in = request.POST.get("check_in")
+        attendance.check_out = request.POST.get("check_out")
+
+        attendance.save()
+
+        return redirect("dashboard")
+
+    return render(
+        request,
+        "edit_attendance.html",
+        {"attendance": attendance}
+    )

@@ -64,6 +64,7 @@
         <th>Status</th>
         <th>Kommen</th>
         <th>Gehen</th>
+        <th>Bearbeiten</th>
         <th>Hinweis</th>
     </tr>
 
@@ -73,6 +74,10 @@
         <td>{{ student.status }}</td>
         <td>{{ student.check_in }}</td>
         <td>{{ student.check_out }}</td>
+        <td><a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a></td>
+
+</td>
+
         <td>{{ student.note }}</td>
     </tr>
     {% endfor %}
