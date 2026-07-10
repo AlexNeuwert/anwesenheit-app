@@ -32,4 +32,6 @@ urlpatterns = [
     path('monat/', views.monthly_report),
     path('monat/', views.monthly_overview),
     path('edit/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
+    path('new_attendance/<int:student_id>/',views.new_attendance,name='new_attendance'),
+
 ]

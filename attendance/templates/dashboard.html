@@ -81,13 +81,17 @@
         <td>{{ student.check_in }}</td>
         <td>{{ student.check_out }}</td>
         
-        <td><a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a></td>
-
-
-
+        
+<td>
+    {% if student.attendance_id %}
+        <a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a>
+    {% else %}
+        <a href="/new_attendance/{{ student.id }}/">Zeit nachtragen</a>
+    {% endif %}
 </td>
 
-        <td>{{ student.note }}</td>
+
+<td>{{ student.note }}</td>
     </tr>
     {% endfor %}
 

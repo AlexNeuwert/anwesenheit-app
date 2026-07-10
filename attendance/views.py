@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 
 from .models import Student, Attendance
@@ -452,4 +453,31 @@ def edit_attendance(request, attendance_id):
         request,
         "edit_attendance.html",
         {"attendance": attendance}
+    )
+
+def new_attendance(request, student_id):
+
+    student = get_object_or_404(
+        Student,
+        id=student_id
+    )
+
+    if request.method == "POST":
+
+        check_in = request.POST.get("check_in")
+        check_out = request.POST.get("check_out")
+
+        Attendance.objects.create(
+            student=student,
+            date=date.today(),
+            check_in=check_in,
+            check_out=check_out
+        )
+
+        return redirect("dashboard")
+
+    return render(
+        request,
+        "new_attendance.html",
+        {"student": student}
     )

@@ -1,0 +1,21 @@
+<h2>Anwesenheit nachtragen</h2>
+
+<p>{{ student.name }}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        Kommen:
+        <input type="time" name="check_in">
+    </p>
+
+    <p>
+        Gehen:
+        <input type="time" name="check_out">
+    </p>
+
+    <button type="submit">
+        Speichern
+    </button>
+</form>
