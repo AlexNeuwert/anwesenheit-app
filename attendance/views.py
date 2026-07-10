@@ -376,7 +376,8 @@ def monthly_report(request):
     writer.writerow([
         'Name',
         'Klasse',
-        'Monatskosten (€)'
+        'Monatskosten (€)',
+        'Kosten entstanden am'
     ])
 
     students = Student.objects.all()
@@ -397,7 +398,7 @@ def monthly_report(request):
             date__year=year
         )
         total_cost = 0
-
+        cost_dates = []
         for entry in entries:
             if entry.check_in and entry.check_out:
 
@@ -415,13 +416,18 @@ def monthly_report(request):
                 if extra > 0:
                     hours = (extra + 59) // 60
                     total_cost += hours * 6
-                    
-    
+                    cost_dates.append(
+                        entry.date.strftime("%d.%m")
+                    )
+
+        cost_dates_text = ", ".join(cost_dates)
         writer.writerow([
             student.name,
             student.student_class,
-            total_cost
+            total_cost,
+            cost_dates_text
         ])
+
 
     return response
 
