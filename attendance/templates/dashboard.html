@@ -21,6 +21,10 @@
     <button>Export als Excel</button>
 </a>
 
+<input type="month" id="monthSelect">
+
+<label>Monat:</label>
+<input type="month" id="monthSelect">
 
 <button onclick="exportMonth()">
     Monatsabrechnung
@@ -129,8 +133,14 @@ function exportMonth() {
         return;
     }
 
+    let selectedMonth =
+        document.getElementById("monthSelect").value;
+
     window.location.href =
-        "/monat/?class=" + currentClass;
+        "/monat/?class=" +
+        currentClass +
+        "&month=" +
+        selectedMonth;
 }
 // 👇 erste Klasse automatisch anzeigen
 window.onload = function() {
@@ -139,6 +149,17 @@ window.onload = function() {
         first.style.display = "block";
         currentClass = first.getAttribute("data-class");
     }
+    
+    let today = new Date();
+
+        today.setMonth(today.getMonth() - 1);
+
+    let year = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2, '0');
+
+    document.getElementById("monthSelect").value =
+         year + "-" + month;
+
 };
 function toggleStudents(className) {
     const element = document.getElementById("students-" + className);

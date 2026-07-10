@@ -3,6 +3,10 @@ from urllib import request, response
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+
+from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+
 from .models import Student, Attendance
 from datetime import datetime, time
 
@@ -320,87 +324,78 @@ def export_excel(request):
             cost
         ])
   
-
-
-    ws.column_dimensions['A'].width = 30
-    ws.column_dimensions['B'].width = 10
-    ws.column_dimensions['C'].width = 15
-    ws.column_dimensions['D'].width = 15
-    ws.column_dimensions['E'].width = 12
-
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response['Content-Disposition'] = 'attachment; filename=anwesenheit.xlsx'
-
-    wb.save(response)
-    return response
 def monthly_report(request):
-    from django.http import HttpResponse
     import csv
-    from datetime import datetime
     from datetime import date
 
     today = date.today()
 
-    month = request.GET.get("month")
     selected_class = request.GET.get("class")
+    month_string = request.GET.get("month")
 
-    if not month:
+    if month_string:
+        year, month = month_string.split("-")
+        year = int(year)
+        month = int(month)
+    else:
+        year = today.year
         month = today.month
-        response = HttpResponse(content_type ='text/csv; charset=utf-8')
-        response.write('\ufeff')
 
-        response['Content-Disposition'] = 'attachment; filename="monat.csv"'
+    response = HttpResponse(
+        content_type='text/csv; charset=utf-8'
+    )
+    response.write('\ufeff')
 
-        writer = csv.writer(response, delimiter=';')
-        
-        
-        month_names = {
-            1: "Januar",
-            2: "Februar",
-            3: "März",
-            4: "April",
-            5: "Mai",
-            6: "Juni",
-            7: "Juli",
-            8: "August",
-            9: "September",
-            10: "Oktober",
-            11: "November",
-            12: "Dezember"
-        }
+    response['Content-Disposition'] = (
+        'attachment; filename="monat.csv"'
+    )
 
-        writer.writerow([])
+    writer = csv.writer(response, delimiter=';')
 
- 
+    month_names = {
+        1: "Januar",
+        2: "Februar",
+        3: "März",
+        4: "April",
+        5: "Mai",
+        6: "Juni",
+        7: "Juli",
+        8: "August",
+        9: "September",
+        10: "Oktober",
+        11: "November",
+        12: "Dezember"
+    }
 
-   
-
+    writer.writerow([])
     writer.writerow([
-        f"Monatsabrechnung {month_names[int(month)]} {today.year}"
+        f"Monatsabrechnung {month_names[month]} {year}"
     ])
     writer.writerow([])
 
-    writer.writerow(['Name', 'Klasse', 'Monatskosten (€)'])
+    writer.writerow([
+        'Name',
+        'Klasse',
+        'Monatskosten (€)'
+    ])
 
     students = Student.objects.all()
 
-    if selected_class:
-        students = students.filter(student_class=selected_class)
 
-    else:
-        students = Student.objects.all()
+    if selected_class:
+        students = students.filter(
+            student_class=selected_class
+        )
+
+    print("Klasse:", selected_class)
+    print("Anzahl Schüler:", students.count())
 
     for student in students:
-        
         entries = Attendance.objects.filter(
             student=student,
             date__month=month,
-            date__year=today.year
+            date__year=year
         )
-
-
         total_cost = 0
 
         for entry in entries:
@@ -420,7 +415,8 @@ def monthly_report(request):
                 if extra > 0:
                     hours = (extra + 59) // 60
                     total_cost += hours * 6
-
+                    
+    
         writer.writerow([
             student.name,
             student.student_class,
@@ -428,8 +424,11 @@ def monthly_report(request):
         ])
 
     return response
-from django.shortcuts import get_object_or_404
+
+
+
 def edit_attendance(request, attendance_id):
+
     attendance = get_object_or_404(
         Attendance,
         id=attendance_id
