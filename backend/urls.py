@@ -21,7 +21,7 @@ from attendance import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.dashboard),   # ✅ DAS ist neu
+    path('', views.dashboard, name='dashboard'),
     path('scan/<int:student_id>/', views.scan_student),
     path('status/', views.get_status),
     path('scan-page/', views.scanner_page),

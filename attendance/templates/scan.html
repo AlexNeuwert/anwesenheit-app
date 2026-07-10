@@ -12,14 +12,12 @@
 
 <script>
 
+
 function onScanSuccess(decodedText) {
-    // decodedText = das was im QR-Code steht (z.B. "1")
 
-    alert("Gescannter Code: " + decodedText);
-
-    // Weiterleitung zu deinem Django Backend
     window.location.href = "/scan/" + decodedText;
 }
+
 
 var html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",

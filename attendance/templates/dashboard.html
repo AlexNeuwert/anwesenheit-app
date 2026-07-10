@@ -21,9 +21,11 @@
     <button>Export als Excel</button>
 </a>
 
-<a href="/monat/">
-    <button>Monatsabrechnung</button>
-</a>
+
+<button onclick="exportMonth()">
+    Monatsabrechnung
+</button>
+
 
 <hr>
 
@@ -74,7 +76,10 @@
         <td>{{ student.status }}</td>
         <td>{{ student.check_in }}</td>
         <td>{{ student.check_out }}</td>
+        
         <td><a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a></td>
+
+
 
 </td>
 
@@ -103,8 +108,9 @@
 
 <!-- 🔹 JS -->
 <script>
-    
+let currentClass = null;   
 function showClass(className) {
+    currentClass = className;
     let blocks = document.querySelectorAll(".class-block");
 
     blocks.forEach(b => {
@@ -116,12 +122,22 @@ function showClass(className) {
         selected.style.display = "block";
     }
 }
+function exportMonth() {
 
+    if (!currentClass) {
+        alert("Bitte zuerst eine Klasse auswählen.");
+        return;
+    }
+
+    window.location.href =
+        "/monat/?class=" + currentClass;
+}
 // 👇 erste Klasse automatisch anzeigen
 window.onload = function() {
     let first = document.querySelector(".class-block");
     if (first) {
         first.style.display = "block";
+        currentClass = first.getAttribute("data-class");
     }
 };
 function toggleStudents(className) {

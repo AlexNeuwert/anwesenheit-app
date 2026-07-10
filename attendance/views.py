@@ -24,7 +24,11 @@ def dashboard(request):
     grouped_students = defaultdict(list)
 
     for student in students:
-        
+       
+        latest_entry = Attendance.objects.filter(
+            student=student
+        ).last()
+ 
         if selected_date:
             last_entry = Attendance.objects.filter(
                 student=student,
@@ -184,13 +188,21 @@ def scan_student(request, student_id):
     if entry:
         entry.check_out = datetime.now().time()
         entry.save()
-        return HttpResponse(f"{student.name} wurde ausgecheckt ❌")
+        
+        return render(request, "scan_result.html", {
+            "message": f"👋 Komm gut nach Hause, {student.name}!"
+        })
+
     else:
         Attendance.objects.create(
             student=student,
             check_in=datetime.now().time()
         )
-        return HttpResponse(f"{student.name} wurde eingecheckt ✅")
+        
+        return render(request, "scan_result.html", {
+            "message": f"🌞 Guten Morgen, {student.name}! Schön, dass du da bist."
+        })
+
 
 
 # ✅ QR EXPORT
@@ -327,23 +339,66 @@ def monthly_report(request):
     from django.http import HttpResponse
     import csv
     from datetime import datetime
+    from datetime import date
+
+    today = date.today()
+
     month = request.GET.get("month")
-    response = HttpResponse(content_type ='text/csv; charset=utf-8')
-    response.write('\ufeff')
+    selected_class = request.GET.get("class")
 
-    response['Content-Disposition'] = 'attachment; filename="monat.csv"'
+    if not month:
+        month = today.month
+        response = HttpResponse(content_type ='text/csv; charset=utf-8')
+        response.write('\ufeff')
 
-    writer = csv.writer(response, delimiter=';')
+        response['Content-Disposition'] = 'attachment; filename="monat.csv"'
+
+        writer = csv.writer(response, delimiter=';')
+        
+        
+        month_names = {
+            1: "Januar",
+            2: "Februar",
+            3: "März",
+            4: "April",
+            5: "Mai",
+            6: "Juni",
+            7: "Juli",
+            8: "August",
+            9: "September",
+            10: "Oktober",
+            11: "November",
+            12: "Dezember"
+        }
+
+        writer.writerow([])
+
+ 
+
+   
+
+    writer.writerow([
+        f"Monatsabrechnung {month_names[int(month)]} {today.year}"
+    ])
+    writer.writerow([])
+
     writer.writerow(['Name', 'Klasse', 'Monatskosten (€)'])
 
     students = Student.objects.all()
 
+    if selected_class:
+        students = students.filter(student_class=selected_class)
+
+    else:
+        students = Student.objects.all()
+
     for student in students:
         
-        entries = Attendance.objects.filter(student=student)
-
-        if month:
-            entries = entries.filter(date__month=month)
+        entries = Attendance.objects.filter(
+            student=student,
+            date__month=month,
+            date__year=today.year
+        )
 
 
         total_cost = 0
