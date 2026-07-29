@@ -195,7 +195,8 @@ def scan_student(request, student_id):
         entry.save()
         
         return render(request, "scan_result.html", {
-            "message": f"👋 Komm gut nach Hause, {student.name}!"
+            "message": f"👋 Komm gut nach Hause, {student.name}!",
+            "color": "#f7a600"
         })
 
     else:
@@ -205,7 +206,8 @@ def scan_student(request, student_id):
         )
         
         return render(request, "scan_result.html", {
-            "message": f"🌞 Guten Morgen, {student.name}! Schön, dass du da bist."
+            "message": f"🌞 Guten Morgen, {student.name}! Schön, dass du da bist.",
+            "color": "#84bd00"
         })
 
 

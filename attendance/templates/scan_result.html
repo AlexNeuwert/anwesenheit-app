@@ -1,19 +1,75 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Scan erfolgreich</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+                to bottom,
+                #ffffff,
+                #eef8df
+            );
+            margin: 0;
+            text-align: center;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-bottom: 4px solid #84bd00;
+        }
+
+        .header h1 {
+            color: #84bd00;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 50px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            font-size: 40px;
+        }
+
+        .card p {
+            font-size: 22px;
+        }
+
+    </style>
 </head>
+
 <body>
 
-    <h1>{{ message }}</h1>
+<div class="header">
+    <h1>IBB Grundschule Dresden</h1>
+</div>
 
-    <p>Nächster Scan in 5 Sekunden ...</p>
+<div class="card" style="background-color: {{ color }};">
+
+    <h2>{{ message }}</h2>
+
+    <p>
+        Nächster Scan in 5 Sekunden ...
+    </p>
+
+</div>
 
 <script>
 setTimeout(function() {
-     window.location.href = "/scan-page/";
+    window.location.href = "/scan-page/";
 }, 5000);
 </script>
 
 </body>
 </html>
+`
