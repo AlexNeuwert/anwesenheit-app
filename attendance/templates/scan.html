@@ -1,32 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scanner</title>
+    <title>IBB Scanner</title>
+
     <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+            to bottom,
+            #ffffff,
+            #eef8df
+            );  
+
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #84bd00;
+        }
+
+        .header h1 {
+            color: #84bd00;
+            margin: 0;
+        }
+        .welcome-title {
+            color: #e30613; /* IBB-Rot */
+            font-size: 28px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .scanner-card {
+            background: white;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 15px;
+            border-top: 10px solid #84bd00;
+            margin-bottom: 10px;
+        }
+        .scanner-card {
+            background: white;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 15px;
+            border-top: 10px solid #84bd00;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        #reader {
+            width: 400px;
+            margin: auto;
+        }
+        /* Kameraauswahl ausblenden */
+       #reader__camera_selection {
+            display: none !important;
+        }
+
+        /* Dashboard-Leiste ausblenden */
+        #reader__dashboard {
+            display: none !important;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>QR-Code scannen</h1>
+    <div class="header">
+        <h1>IBB Grundschule Dresden</h1>
+    </div>
 
-<div id="reader" style="width:300px;"></div>
+    <div class="scanner-card">
+        <h2 class="welcome-title">
 
-<script>
+            An- und Abmeldung
 
+        </h2>
+        <h3>📷 QR-Code scannen</h3>
 
-function onScanSuccess(decodedText) {
+        <div id="reader"></div>
 
-    window.location.href = "/scan/" + decodedText;
-}
+    </div>
 
+    <script>
 
-var html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
-    { fps: 10, qrbox: 200 }
-);
+    function onScanSuccess(decodedText) {
+        window.location.href = "/scan/" + decodedText;
+    }
 
-html5QrcodeScanner.render(onScanSuccess);
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader",
+        { fps: 10, qrbox: 200 }
+    );
 
-</script>
+    html5QrcodeScanner.render(onScanSuccess);
+
+    </script>
 
 </body>
 </html>
