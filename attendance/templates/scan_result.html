@@ -44,6 +44,20 @@
         .card p {
             font-size: 22px;
         }
+        .class-btn {
+            margin: 5px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+.class-btn.active {
+    border: 3px solid black;
+    transform: scale(1.1);
+}
+           
 
     </style>
 </head>
@@ -54,7 +68,7 @@
     <h1>IBB Grundschule Dresden</h1>
 </div>
 
-<div class="card" style="background-color: {{ color }};">
+<div class="card" style="background-color: {{color }};">
 
     <h2>{{ message }}</h2>
 

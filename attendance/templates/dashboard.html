@@ -9,6 +9,91 @@
             padding: 5px 10px;
             cursor: pointer;
         }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th {
+            background-color: #84bd00;
+            color: black;
+            padding: 12px;
+            font-weight: bold;
+        }
+        td {
+            background-color: white;
+        }
+        tr:nth-child(even) td {
+            background-color: #f5f5f5;
+        }
+        .note-cell {
+            background-color: #fff8d6;
+        }
+
+        .class-btn {
+            margin: 5px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 20px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .class-1 {
+            background-color: #84bd00;
+        }
+
+        .class-2 {
+            background-color: #4D96FF;
+        }
+
+        .class-3 {
+            background-color: #f7a600;
+        }
+
+        .class-4 {
+            background-color: #e30613;
+        }
+        button {
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }  
+        body {
+            font-family: 'Nunito', sans-serif;
+        } 
+        .class-block {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
     </style>
 </head>
 
@@ -21,7 +106,6 @@
     <button>Export als Excel</button>
 </a>
 
-<input type="month" id="monthSelect">
 
 <label>Monat:</label>
 <input type="month" id="monthSelect">
@@ -30,6 +114,11 @@
     Monatsabrechnung
 </button>
 
+<button onclick="location.reload()">
+
+Aktualisieren
+
+</button>
 
 <hr>
 
@@ -41,7 +130,11 @@
 <div id="classButtons">
 
 {% for class_name, class_students in grouped_students.items %}
-    <button onclick="showClass('{{ class_name }}')" style="margin:5px;">
+    <button
+        id="btn-{{ class_name }}"
+        onclick="showClass('{{ class_name }}')"
+        class="class-btn class-{{ class_name|first }}"
+    >
         {{ class_name }}
     </button>
 {% endfor %}
@@ -107,18 +200,15 @@
 
 <hr>
 
-<!-- 🔹 Status -->
-<h2>Status</h2>
-
-<a href="/">
-    <button>Aktualisieren</button>
-</a>
-
 <!-- 🔹 JS -->
 <script>
 let currentClass = null;   
 function showClass(className) {
     currentClass = className;
+    document.querySelectorAll(".class-btn")
+        .forEach(btn => btn.classList.remove("active"));
+    document.getElementById("btn-" + className)
+        .classList.add("active");
     let blocks = document.querySelectorAll(".class-block");
 
     blocks.forEach(b => {
@@ -129,7 +219,29 @@ function showClass(className) {
     if (selected) {
         selected.style.display = "block";
     }
+    let ths = document.querySelectorAll("th");
+
+    ths.forEach(th => {
+        th.style.backgroundColor = "";
+    });
+
+    if (className.startsWith("1")) {
+        ths.forEach(th => th.style.backgroundColor = "#84bd00");
+    }
+
+    if (className.startsWith("2")) {
+        ths.forEach(th => th.style.backgroundColor = "#4D96FF");
+    }
+
+    if (className.startsWith("3")) {
+    ths.forEach(th => th.style.backgroundColor = "#f7a600");
+    }
+
+    if (className.startsWith("4")) {
+        ths.forEach(th => th.style.backgroundColor = "#e30613");
+    }
 }
+
 function exportMonth() {
 
     if (!currentClass) {
@@ -152,6 +264,10 @@ window.onload = function() {
     if (first) {
         first.style.display = "block";
         currentClass = first.getAttribute("data-class");
+        document.getElementById(
+
+            "btn-" + currentClass
+        ).classList.add("active");
     }
     
     let today = new Date();

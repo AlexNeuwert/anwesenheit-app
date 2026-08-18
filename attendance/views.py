@@ -326,7 +326,17 @@ def export_excel(request):
             check_out.strftime("%H:%M") if isinstance(check_out, time) else "-",
             cost
         ])
-  
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+
+        response['Content-Disposition'] = (
+            'attachment; filename="anwesenheit.xlsx"'
+        )
+
+        wb.save(response)
+
+        return response
 def monthly_report(request):
     import csv
     from datetime import date
