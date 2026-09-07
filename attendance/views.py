@@ -266,8 +266,13 @@ def export_qr(request):
         c.rect(x, y, card_width, card_height)
 
         center_x = x + card_width / 2
+        name_parts = student.name.split()
 
-        name = student.name
+        if len(name_parts) >= 2:
+            display_name = f"{name_parts[0]} {name_parts[-1][0]}."
+        else:
+            display_name = name_parts[0]
+        name = display_name
 
         if len(name) > 30:
             part1 = name[:30]
