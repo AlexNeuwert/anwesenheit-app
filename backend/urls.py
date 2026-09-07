@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path
 
 from attendance import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('', views.dashboard, name='dashboard'),
     path('scan/<int:student_id>/', views.scan_student),
     path('status/', views.get_status),
@@ -33,5 +36,6 @@ urlpatterns = [
     path('monat/', views.monthly_overview),
     path('edit/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
     path('new_attendance/<int:student_id>/',views.new_attendance,name='new_attendance'),
+
 
 ]

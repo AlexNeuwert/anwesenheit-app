@@ -3,7 +3,27 @@
 <head>
     <title>Anwesenheit</title>
 
-    <style>
+        <style>
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
         .student-btn {
             margin: 3px;
             padding: 5px 10px;
@@ -94,13 +114,25 @@
             margin-top: 20px;
         }
         
-    </style>
+        
+        </style>
 </head>
 
 <body>
 
-<h1>Anwesenheit</h1>
 
+
+<div class="top-bar">
+    <h1>Anwesenheit</h1>
+
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">
+            🚪 Abmelden
+        </button>
+    </form>
+</div>   
+    
 <!-- 🔹 Buttons oben -->
 <a href="/export_excel/">
     <button>Export als Excel</button>
@@ -115,9 +147,7 @@
 </button>
 
 <button onclick="location.reload()">
-
-Aktualisieren
-
+    Aktualisieren
 </button>
 
 <hr>
@@ -163,8 +193,9 @@ Aktualisieren
         <th>Status</th>
         <th>Kommen</th>
         <th>Gehen</th>
-        <th>Bearbeiten</th>
+        <th>Bearbeiten </th>
         <th>Hinweis</th>
+        <th>Tagesnotiz</th>
     </tr>
 
     {% for student in class_students %}
@@ -173,18 +204,18 @@ Aktualisieren
         <td>{{ student.status }}</td>
         <td>{{ student.check_in }}</td>
         <td>{{ student.check_out }}</td>
+    
         
-        
-<td>
-    {% if student.attendance_id %}
-        <a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a>
-    {% else %}
-        <a href="/new_attendance/{{ student.id }}/">Zeit nachtragen</a>
-    {% endif %}
-</td>
+        <td>
+            {% if student.attendance_id %}
+                <a href="/edit/{{ student.attendance_id }}/">Bearbeiten</a>
+            {% else %}
+                <a href="/new_attendance/{{ student.id }}/">Zeit nachtragen</a>
+            {% endif %}
+        </td>
 
-
-<td>{{ student.note }}</td>
+        <td>{{ student.note }}</td>
+        <td>{{ student.daily_note }}</td>
     </tr>
     {% endfor %}
 
@@ -205,6 +236,7 @@ Aktualisieren
 let currentClass = null;   
 function showClass(className) {
     currentClass = className;
+    localStorage.setItem("selectedClass",className);
     document.querySelectorAll(".class-btn")
         .forEach(btn => btn.classList.remove("active"));
     document.getElementById("btn-" + className)
@@ -260,27 +292,45 @@ function exportMonth() {
 }
 // 👇 erste Klasse automatisch anzeigen
 window.onload = function() {
-    let first = document.querySelector(".class-block");
-    if (first) {
-        first.style.display = "block";
-        currentClass = first.getAttribute("data-class");
-        document.getElementById(
 
-            "btn-" + currentClass
-        ).classList.add("active");
+    let savedClass =
+        localStorage.getItem("selectedClass");
+
+    if (savedClass) {
+
+        showClass(savedClass);
+
+    } else {
+
+        let first =
+            document.querySelector(".class-block");
+
+        if (first) {
+
+            first.style.display = "block";
+
+            currentClass =
+                first.getAttribute("data-class");
+
+            document.getElementById(
+                "btn-" + currentClass
+            ).classList.add("active");
+        }
     }
-    
+
     let today = new Date();
 
-        today.setMonth(today.getMonth() - 1);
+    today.setMonth(today.getMonth() - 1);
 
     let year = today.getFullYear();
     let month = String(today.getMonth() + 1).padStart(2, '0');
 
     document.getElementById("monthSelect").value =
-         year + "-" + month;
-
+        year + "-" + month;
 };
+
+    
+
 function toggleStudents(className) {
     const element = document.getElementById("students-" + className);
 

@@ -22,6 +22,9 @@
             value="{{ attendance.check_out|time:'H:i' }}"
         >
     </p>
+    <p>Tagesnotiz:</p>
+
+    <textarea name="daily_note" rows="4" cols="50">{{ attendance.daily_note }}</textarea>
 
     <button type="submit">
         Speichern

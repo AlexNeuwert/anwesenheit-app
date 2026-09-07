@@ -1,4 +1,5 @@
 import csv
+from tkinter.font import Font
 from urllib import request, response
 
 from django.shortcuts import redirect, render
@@ -8,6 +9,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 
+
 from .models import Student, Attendance
 from datetime import datetime, time
 
@@ -16,8 +18,10 @@ import qrcode
 from reportlab.lib.utils import ImageReader
 from openpyxl import Workbook
 from collections import defaultdict
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def dashboard(request):
     
     from datetime import date
@@ -68,6 +72,8 @@ def dashboard(request):
             check_in = None
             check_out = None
             status = "❌"
+        print(student.name, "| Tagesnotiz:", last_entry.daily_note if last_entry else "KEIN EINTRAG")
+
 
         grouped_students[student.student_class].append({
             "id": student.id,
@@ -77,7 +83,8 @@ def dashboard(request):
             "check_out": check_out.strftime("%H:%M") if check_out else "-",
             "status": status,
             "attendance_id": latest_entry.id if latest_entry else None,
-            "note": student.note
+            "note": student.note,
+            "daily_note": latest_entry.daily_note if latest_entry else "", 
         })
    
     
@@ -88,6 +95,7 @@ def dashboard(request):
 
 from datetime import date
 
+@login_required
 def monthly_overview(request):
     today = date.today()
 
@@ -213,6 +221,7 @@ def scan_student(request, student_id):
 
 
 # ✅ QR EXPORT
+
 def export_qr(request):
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import A4
@@ -288,7 +297,7 @@ def export_qr(request):
     return response
 
     
-
+@login_required
 def export_excel(request):
     from openpyxl import Workbook
 
@@ -297,8 +306,42 @@ def export_excel(request):
     ws.title = "Anwesenheit"
 
     ws.append(['Name', 'Klasse', 'Kommen', 'Gehen', 'Kosten (€)'])
+    from openpyxl.styles import Font
+    from openpyxl.styles import Font, PatternFill
+    from openpyxl.styles import Border, Font, PatternFill
+    from openpyxl.styles import Font, PatternFill, Side
+    from openpyxl.styles import Alignment, Font, PatternFill
+
+    header_fill = PatternFill(
+        start_color="84BD00",
+        end_color="84BD00",
+        fill_type="solid"
+    )
+
+    header_font = Font(
+        bold=True,
+        color="FFFFFF"
+    )
+
+    thin_border = Border(
+        left=Side(style="thin"),
+        right=Side(style="thin"),
+        top=Side(style="thin"),
+        bottom=Side(style="thin")
+    )
+
+    # Kopfzeile formatieren
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.border = thin_border
+        cell.alignment = Alignment(horizontal="center")
 
     students = Student.objects.all()
+    print("Anzahl Schüler:", students.count())
+
+    for student in students:
+        print("Exportiere:", student.name)
 
     for student in students:
         from datetime import date
@@ -326,17 +369,39 @@ def export_excel(request):
             check_out.strftime("%H:%M") if isinstance(check_out, time) else "-",
             cost
         ])
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
-        response['Content-Disposition'] = (
-            'attachment; filename="anwesenheit.xlsx"'
-        )
+    response['Content-Disposition'] = (
+        'attachment; filename="anwesenheit.xlsx"'
+    )
+    ws.auto_filter.ref = ws.dimensions
+    
+    
+    for row in ws.iter_rows():
+        for cell in row:
+            cell.border = thin_border
+            cell.alignment = Alignment(
+                horizontal="center",
+                vertical="center"
+            )
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
 
-        wb.save(response)
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
 
-        return response
+        ws.column_dimensions[column_letter].width = max_length + 2   
+        ws.freeze_panes = "A2" 
+    wb.save(response)    
+    return response
+@login_required   
 def monthly_report(request):
     import csv
     from datetime import date
@@ -445,7 +510,7 @@ def monthly_report(request):
     return response
 
 
-
+@login_required
 def edit_attendance(request, attendance_id):
 
     attendance = get_object_or_404(
@@ -454,8 +519,13 @@ def edit_attendance(request, attendance_id):
     )
 
     if request.method == "POST":
-        attendance.check_in = request.POST.get("check_in")
-        attendance.check_out = request.POST.get("check_out")
+        check_in = request.POST.get("check_in")
+        check_out = request.POST.get("check_out")
+
+        attendance.check_in = check_in if check_in else None
+        attendance.check_out = check_out if check_out else None
+
+        attendance.daily_note = request.POST.get("daily_note")
 
         attendance.save()
 
@@ -466,7 +536,7 @@ def edit_attendance(request, attendance_id):
         "edit_attendance.html",
         {"attendance": attendance}
     )
-
+@login_required
 def new_attendance(request, student_id):
 
     student = get_object_or_404(
@@ -478,12 +548,14 @@ def new_attendance(request, student_id):
 
         check_in = request.POST.get("check_in")
         check_out = request.POST.get("check_out")
+        daily_note = request.POST.get("daily_note")
 
         Attendance.objects.create(
             student=student,
             date=date.today(),
             check_in=check_in,
-            check_out=check_out
+            check_out=check_out,
+            daily_note=daily_note
         )
 
         return redirect("dashboard")

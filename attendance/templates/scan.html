@@ -30,7 +30,7 @@
             margin: 0;
         }
         .welcome-title {
-            color: #e30613; /* IBB-Rot */
+            color: #e30613; 
             font-size: 28px;
             margin-top: 15px;
             margin-bottom: 10px;
@@ -91,23 +91,38 @@
         </h2>
         <h3>📷 QR-Code scannen</h3>
 
-        <div id="reader"></div>
+    <div id="status-text"></div>
+    <div id="reader"></div>
+    <div id="start-btn-container">
+        <button onclick="startScanner()">Start</button>
 
     </div>
 
     <script>
 
     function onScanSuccess(decodedText) {
-        window.location.href = "/scan/" + decodedText;
+        window.location.href = "/scan/" + encodeURIComponent(decodedText);
     }
-
-    var html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: 200 }
-    );
-
-    html5QrcodeScanner.render(onScanSuccess);
-
+    const html5QrCode = new Html5Qrcode("reader");
+    const qrConfig = { fps: 10, qrbox: 200 };
+        
+    function startScanner() {
+        document.getElementById("status-text").innerText = "Kamera wird gestartet...";
+        html5QrCode.start(
+            { facingMode: "environment" },
+            qrConfig,
+            onScanSuccess
+        ).then(() => {
+            // Scanner erfolgreich gestartet
+            document.getElementById("start-btn-container").style.display = "none";
+            document.getElementById("status-text").innerText = "Suche nach QR-Code...";
+        }).catch(err => {
+            console.error("Fehler beim Starten der Kamera:", err);
+            document.getElementById("start-btn-container").style.display = "block";
+            document.getElementById("status-text").innerText = "Zugriff blockiert. Bitte klicken Sie auf den Button, um den Kamerazugriff freizugeben.";
+        });
+    }
+    startScanner();
     </script>
 
 </body>
