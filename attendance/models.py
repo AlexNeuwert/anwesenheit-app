@@ -6,7 +6,7 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     student_class = models.CharField(max_length=10)
     note = models.TextField(blank=True)
-    
+    student_id = models.CharField(max_length=20, null=True, blank=True)
 
 
 

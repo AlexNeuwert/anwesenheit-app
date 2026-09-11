@@ -77,6 +77,7 @@ def dashboard(request):
 
         grouped_students[student.student_class].append({
             "id": student.id,
+            "student_id": student.student_id,
             "name": student.name,
             "class": student.student_class,
             "check_in": check_in.strftime("%H:%M") if check_in else "-",
@@ -130,6 +131,7 @@ def monthly_overview(request):
                     total_cost += hours * 6
 
         results.append({
+            "student_id": student.student_id,
             "name": student.name,
             "class": student.student_class,
             "cost": total_cost
@@ -310,7 +312,7 @@ def export_excel(request):
     ws = wb.active
     ws.title = "Anwesenheit"
 
-    ws.append(['Name', 'Klasse', 'Kommen', 'Gehen', 'Kosten (€)'])
+    ws.append(['ID', 'Name', 'Klasse', 'Kommen', 'Gehen', 'Kosten (€)'])
     from openpyxl.styles import Font
     from openpyxl.styles import Font, PatternFill
     from openpyxl.styles import Border, Font, PatternFill
@@ -368,6 +370,7 @@ def export_excel(request):
         cost = 0
     
         ws.append([
+            student.student_id,
             student.name,
             student.student_class,
             check_in.strftime("%H:%M") if isinstance(check_in, time) else "-",
@@ -457,6 +460,7 @@ def monthly_report(request):
     writer.writerow([])
 
     writer.writerow([
+        'ID',
         'Name',
         'Klasse',
         'Monatskosten (€)',
@@ -505,6 +509,7 @@ def monthly_report(request):
 
         cost_dates_text = ", ".join(cost_dates)
         writer.writerow([
+            student.student_id,
             student.name,
             student.student_class,
             total_cost,

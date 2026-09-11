@@ -189,6 +189,7 @@
 
         <table border="1" style="margin-top:10px;">
     <tr>
+        <th>ID</th>
         <th>Name</th>
         <th>Status</th>
         <th>Kommen</th>
@@ -200,6 +201,7 @@
 
     {% for student in class_students %}
     <tr>
+        <td>{{ student.student_id }}</td>
         <td>{{ student.name }}</td>
         <td>{{ student.status }}</td>
         <td>{{ student.check_in }}</td>
