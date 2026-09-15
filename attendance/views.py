@@ -72,7 +72,7 @@ def dashboard(request):
             check_in = None
             check_out = None
             status = "❌"
-        print(student.name, "| Tagesnotiz:", last_entry.daily_note if last_entry else "KEIN EINTRAG")
+        print(student.name, "| Tagesnotiz:", student.dashboard_note)
 
 
         grouped_students[student.student_class].append({
@@ -85,7 +85,7 @@ def dashboard(request):
             "status": status,
             "attendance_id": latest_entry.id if latest_entry else None,
             "note": student.note,
-            "daily_note": latest_entry.daily_note if latest_entry else "", 
+            "dashboard_note": student.dashboard_note, 
         })
    
     
@@ -531,14 +531,15 @@ def edit_attendance(request, attendance_id):
     if request.method == "POST":
         check_in = request.POST.get("check_in")
         check_out = request.POST.get("check_out")
+        dashboard_note = request.POST.get("dashboard_note")
 
         attendance.check_in = check_in if check_in else None
         attendance.check_out = check_out if check_out else None
-
-        attendance.daily_note = request.POST.get("daily_note")
+        attendance.student.dashboard_note = dashboard_note
+        
 
         attendance.save()
-
+        attendance.student.save()
         return redirect("dashboard")
 
     return render(
@@ -558,14 +559,14 @@ def new_attendance(request, student_id):
 
         check_in = request.POST.get("check_in")
         check_out = request.POST.get("check_out")
-        daily_note = request.POST.get("daily_note")
+        
 
         Attendance.objects.create(
             student=student,
             date=date.today(),
             check_in=check_in,
             check_out=check_out,
-            daily_note=daily_note
+            
         )
 
         return redirect("dashboard")

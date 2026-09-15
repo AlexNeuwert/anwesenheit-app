@@ -217,7 +217,7 @@
         </td>
 
         <td>{{ student.note }}</td>
-        <td>{{ student.daily_note }}</td>
+        <td>{{ student.dashboard_note }}</td>
     </tr>
     {% endfor %}
 
@@ -330,6 +330,9 @@ window.onload = function() {
     document.getElementById("monthSelect").value =
         year + "-" + month;
 };
+setInterval(function() {
+    location.reload();
+}, 10000);
 
     
 
@@ -347,7 +350,7 @@ function toggleStudents(className) {
         element.style.display = "none";
     }
 }
-
+        
 </script>
 
 </body>
