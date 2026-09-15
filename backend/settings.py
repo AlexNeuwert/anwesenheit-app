@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-1rbjfp0us1fv&o!q=yiuij(ca&_c2a+67hb2*oyt&j$sp@gk6b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['grundschule.ibb-dresden.de']
 
 
 # Application definition
