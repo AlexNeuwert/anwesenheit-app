@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-1rbjfp0us1fv&o!q=yiuij(ca&_c2a+67hb2*oyt&j$sp@gk6b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['grundschule.ibb-dresden.de']
+ALLOWED_HOSTS = [
+    "grundschule.ibb-dresden.de",
+    "127.0.0.1",
+    "localhost",
+    ]
 
 
 # Application definition
@@ -118,3 +122,4 @@ STATIC_URL = 'static/'
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+

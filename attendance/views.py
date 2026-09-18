@@ -1,12 +1,9 @@
 import csv
-from tkinter.font import Font
 from urllib import request, response
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 
-from django.shortcuts import render
-from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 
 
@@ -312,12 +309,11 @@ def export_excel(request):
     ws = wb.active
     ws.title = "Anwesenheit"
 
-    ws.append(['ID', 'Name', 'Klasse', 'Kommen', 'Gehen', 'Kosten (€)'])
-    from openpyxl.styles import Font
-    from openpyxl.styles import Font, PatternFill
-    from openpyxl.styles import Border, Font, PatternFill
-    from openpyxl.styles import Font, PatternFill, Side
-    from openpyxl.styles import Alignment, Font, PatternFill
+    ws.append(['ID', 'Name', 'Klasse', 'Kommen', 'Gehen', 'Dauer (Minuten)'])
+   
+    
+    from openpyxl.styles import (Font, PatternFill, Border, Side, Alignment)
+   
 
     header_fill = PatternFill(
         start_color="84BD00",
@@ -362,12 +358,36 @@ def export_excel(request):
         if last_entry:
             check_in = last_entry.check_in
             check_out = last_entry.check_out
+            duration = 0
+
+            if check_in and check_out:
+
+                in_min = (
+                    check_in.hour * 60
+                    + check_in.minute
+                )
+
+                out_min = (
+                    check_out.hour * 60
+                    + check_out.minute
+                )
+
+                # vor 07:30 Uhr
+                if in_min < 450:
+                    duration += 450 - in_min
+
+                # nach 16:00 Uhr
+                if out_min > 960:
+                    duration += out_min - 960
 
         else:
             check_in = None
             check_out = None
+            duration = 0
 
-        cost = 0
+      
+
+   
     
         ws.append([
             student.student_id,
@@ -375,7 +395,7 @@ def export_excel(request):
             student.student_class,
             check_in.strftime("%H:%M") if isinstance(check_in, time) else "-",
             check_out.strftime("%H:%M") if isinstance(check_out, time) else "-",
-            cost
+            duration
         ])
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -453,22 +473,16 @@ def monthly_report(request):
         12: "Dezember"
     }
 
-    writer.writerow([])
     writer.writerow([
-        f"Monatsabrechnung {month_names[month]} {year}"
+        f"Monatsübersicht für {month_names[month]} {year}"
+    ])  
+    writer.writerow([
+        "ID", "Name", "Klasse", "Dauer (Minuten)", "Kosten (Euro)", "Datum"
     ])
-    writer.writerow([])
 
-    writer.writerow([
-        'ID',
-        'Name',
-        'Klasse',
-        'Monatskosten (€)',
-        'Kosten entstanden am'
-    ])
+    
 
     students = Student.objects.all()
-
 
     if selected_class:
         students = students.filter(
@@ -484,8 +498,9 @@ def monthly_report(request):
             date__month=month,
             date__year=year
         )
-        total_cost = 0
+        total_extra_minutes = 0
         cost_dates = []
+
         for entry in entries:
             if entry.check_in and entry.check_out:
 
@@ -501,22 +516,35 @@ def monthly_report(request):
                     extra += out_min - 960
 
                 if extra > 0:
-                    hours = (extra + 59) // 60
-                    total_cost += hours * 6
+
+                    total_extra_minutes += extra
+
                     cost_dates.append(
                         entry.date.strftime("%d.%m")
                     )
+        rounded_hours = (
+            total_extra_minutes + 59
+        ) // 60
 
+        total_cost = rounded_hours * 6
         cost_dates_text = ", ".join(cost_dates)
+
+        print(
+            student.name,
+            "| Minuten:", total_extra_minutes,
+            "| Kosten:", total_cost
+        )
+
         writer.writerow([
             student.student_id,
             student.name,
             student.student_class,
-            total_cost,
+            total_extra_minutes,  # Dauer in Minuten
+            total_cost,  # Kosten in Euro    
             cost_dates_text
         ])
 
-
+       
     return response
 
 
