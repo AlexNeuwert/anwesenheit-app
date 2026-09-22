@@ -194,26 +194,42 @@ def scan_student(request, student_id):
 
     entry = Attendance.objects.filter(
         student=student,
-        check_out__isnull=True
+        date=date.today()
     ).first()
 
     if entry:
-        entry.check_out = datetime.now().time()
-        entry.save()
-        
-        return render(request, "scan_result.html", {
-            "message": f"👋 Komm gut nach Hause, {student.name}!",
-            "color": "#f7a600"
-        })
+
+        if entry.check_out is None:
+
+            entry.check_out = datetime.now().time()
+            entry.save()
+
+            return render(request, "scan_result.html", {
+                "message": f"👋 Komm gut nach Hause, {student.name}!",
+                "color": "#f7a600"
+            })
+
+        else:
+
+            return render(
+                request,
+                "scan_result.html",
+                {
+                    "message": f"{student.name} wurde heute bereits an- und abgemeldet.",
+                    "color": "#ff6666"
+                }
+            )
 
     else:
+
         Attendance.objects.create(
             student=student,
-            check_in=datetime.now().time()
+            check_in=datetime.now().time(),
+            date=date.today()
         )
-        
+
         return render(request, "scan_result.html", {
-            "message": f"🌞 Guten Morgen, {student.name}! Schön, dass du da bist.",
+            "message": f"👋 Guten Morgen, {student.name}! Schön, dass du da bist.",
             "color": "#84bd00"
         })
 
