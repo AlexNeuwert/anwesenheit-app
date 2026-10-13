@@ -25,7 +25,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('', views.dashboard, name='dashboard'),
-    path('scan/<int:student_id>/', views.scan_student),
+    path('scan/<str:student_id>/', views.scan_student),
     path('status/', views.get_status),
     path('scan-page/', views.scanner_page),
     path('qr/<int:student_id>/', views.generate_qr),

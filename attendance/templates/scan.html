@@ -93,6 +93,14 @@
 
     <div id="status-text"></div>
     <div id="reader"></div>
+    <input
+        id="scannerInput"
+        type="text"
+        autofocus
+        placeholder="Scanner Test"
+        style="font-size:30px; width:300px;"
+    >
+
     <div id="start-btn-container">
         <button onclick="startScanner()">Start</button>
 
@@ -100,8 +108,26 @@
 
     <script>
 
+
+    let lastCode = "";
+    let lastScanTime = 0;
     function onScanSuccess(decodedText) {
-        window.location.href = "/scan/" + encodeURIComponent(decodedText);
+
+    const now = Date.now();
+
+    // Gleichen Code innerhalb von 3 Sekunden ignorieren
+    if (
+        decodedText === lastCode &&
+        now - lastScanTime < 3000
+    ) {
+        return;
+    }
+
+    lastCode = decodedText;
+    lastScanTime = now;
+
+    window.location.href =
+        "/scan/" + encodeURIComponent(decodedText);
     }
     const html5QrCode = new Html5Qrcode("reader");
     const qrConfig = { fps: 10, qrbox: 200 };
@@ -123,6 +149,24 @@
         });
     }
     startScanner();
+        document
+        .getElementById("scannerInput")
+        .addEventListener("keyup", function(e){
+
+          
+            if(e.key === "Enter"){
+
+                let code = this.value.trim();
+
+            console.log("Scanner-Code:", code);
+
+            this.value = "";
+
+            window.location.href =
+                "/scan/" + encodeURIComponent(code);
+            }
+
+        });
     </script>
 
 </body>
